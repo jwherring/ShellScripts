@@ -1,0 +1,24 @@
+#!/bin/bash
+
+print_usage() {
+  echo "increment score successful attempted
+
+  score - today's ending ELO rating
+  successful - number of successful puzzle attempts
+  attempted - number of overall attempts
+
+  increment will add a line to the end of fifteendays.tsv
+  if any of the three required arguments are missing, it exits with this message
+  "
+}
+
+if [ $# -ne 3 ]; then 
+  print_usage
+  exit 1
+fi
+
+DAYS=(`wc -l fifteendays.tsv`)
+DAYNUM="$((${DAYS[0]} + 1))"
+TODAY=`date +%F`
+LASTLINE=`awk 'END {print $4}' fifteendays.tsv`
+echo -e "$DAYNUM\t$TODAY\t$LASTLINE\t$1\t$2\t$3" >> fifteendays.tsv
