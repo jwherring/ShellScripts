@@ -2,6 +2,10 @@ BEGIN {
 	goal = 2700
 	dayrate = 25
 	daysallowed = 15
+  print_header()
+}
+
+function print_header() {
 	printf "%-7s %-15s %-15s %-20s %-30s %-15s %-30s\n", "Day","End Score", "Score Change", "Deficit/Surplus", "Days Remaining at 25/day","Day Buffer", "Current Daily Requirement";
 	printf "%-7s %-15s %-15s %-20s %-30s %-15s %-30s\n", rep(length("Day"),"-"), rep(length("End Score"), "-"), rep(length("Score Change"), "-"), rep(length("Deficit/Surplus"), "-"), rep(length("Days Remaining at 25/day"), "-"), rep(length("Day Buffer"), "-"), rep(length("Current Daily Requirement"), "-");
 }
