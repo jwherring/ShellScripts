@@ -1,0 +1,92 @@
+#!/bin/bash
+
+remove_empty_lines() {
+  sed -i '/^[[:space:]]*$/d' $fh
+}
+
+remove_last_line() {
+  head -n -1 $fh > tmp.json
+  mv tmp.json $fh
+}
+
+remove_leading_spaces() {
+  sed -i 's/^[[:space:]]*//' $fh
+}
+
+quote_json_field_names() {
+  sed -i -r 's/^([a-zA-Z0-9]+):/"\1":/' $fh
+}
+
+wrap_in_json_array() {
+  echo "}]" >> $fh
+  echo "[{" | cat - $fh > tmp.out
+  mv tmp.out $fh
+}
+
+repair_single_quoted_fields() {
+  sed -i 's/":[[:space:]]*'\''/": "/g' $fh
+  sed -i 's/'\'',/",/g' $fh
+}
+
+remove_final_comma() {
+  jq -n -f $fh > tmp.json
+  mv tmp.json $fh
+}
+
+make_tsv_input() {
+  jq -r '.[] | map(tostring) | @tsv' < result.json > result.tsv
+}
+
+load_into_database() {
+  sqlite3 chessproblems.sqlite <<EOF
+.mode tabs
+.import result.tsv chessproblems
+EOF
+}
+
+jsonify_output() {
+  remove_empty_lines
+  remove_last_line
+  remove_leading_spaces
+  quote_json_field_names
+  wrap_in_json_array
+  repair_single_quoted_fields
+  remove_final_comma
+  make_tsv_input
+  load_into_database
+}
+
+cleanup() {
+  rm result.json
+  rm result.tsv
+}
+
+create_db_if_not_exists(){
+  if ! [ -f chessproblems.sqlite ]; then 
+    sqlite3 chessproblems.sqlite < chess.sql
+  fi
+}
+
+print_usage() {
+  cat <<INSTRUCTIONS
+Usage: waystation {username} {sessionid}
+
+You will need to get a session id by logging in to chess.com and using a tool to inspect the session cookies.  
+
+The necessary cookie is called PHPSESSID.  
+Use the value of this cookie for {sessionid}.
+INSTRUCTIONS
+}
+
+if [ $# -ne 2 ]; then 
+  print_usage
+  exit 1
+fi
+
+CMD="curl https://www.chess.com/stats/puzzles/$1 -b PHPSESSID=$2 | grep -A 18 window.chesscom.stats.recentRatedProblems | grep -v recentRatedProblems | sed 's/})/},{/' >> result.json"
+eval $CMD
+
+fh='result.json'
+create_db_if_not_exists
+jsonify_output
+cleanup
