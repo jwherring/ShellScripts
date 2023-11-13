@@ -57,8 +57,12 @@ jsonify_output() {
 }
 
 cleanup() {
-  rm result.json
-  rm result.tsv
+  if [ -f result.json ]; then
+    rm result.json
+  fi
+  if [ -f result.tsv ]; then
+    rm result.tsv
+  fi
 }
 
 create_db_if_not_exists(){
