@@ -3,7 +3,15 @@ BEGIN {
 	dayrate = 25
 	daysallowed = 15
 	printf "%-7s %-15s %-15s %-20s %-30s %-15s %-30s\n", "Day","End Score", "Score Change", "Deficit/Surplus", "Days Remaining at 25/day","Day Buffer", "Current Daily Requirement";
-	printf "%-7s %-15s %-15s %-20s %-30s %-15s %-30s\n", "---","---------", "------------","---------------", "------------------------","----------", "-------------------------";
+	printf "%-7s %-15s %-15s %-20s %-30s %-15s %-30s\n", rep(length("Day"),"-"), rep(length("End Score"), "-"), rep(length("Score Change"), "-"), rep(length("Deficit/Surplus"), "-"), rep(length("Days Remaining at 25/day"), "-"), rep(length("Day Buffer"), "-"), rep(length("Current Daily Requirement"), "-");
+}
+
+function rep(l,c){
+  t = "" #necessary because vars are apparently all global in awk!
+  while (l-- > 0){
+    t = t c
+  }
+  return t
 }
 
 function days_remaining_string(remdays, daysremaining){
