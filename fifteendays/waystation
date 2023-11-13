@@ -58,8 +58,6 @@ jsonify_output() {
   repair_single_quoted_fields
   remove_final_comma
   convert_dates
-  make_tsv_input
-  load_into_database
 }
 
 cleanup() {
@@ -102,4 +100,6 @@ eval $CMD
 fh='result.json'
 create_db_if_not_exists
 jsonify_output
+make_tsv_input
+load_into_database
 cleanup
