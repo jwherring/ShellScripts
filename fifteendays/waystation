@@ -63,7 +63,7 @@ cleanup() {
 
 create_db_if_not_exists(){
   if ! [ -f chessproblems.sqlite ]; then 
-    sqlite3 chessproblems.sqlite < chess.sql
+    sqlite3 chessproblems.sqlite < chessdb.sql
   fi
 }
 
