@@ -33,8 +33,13 @@ remove_final_comma() {
   mv tmp.json $fh
 }
 
+convert_dates() {
+  jq '.[].date |= (. | strptime("%b %d, %Y") | strftime("%F"))' $fh > tmp.json
+  mv tmp.json $fh
+}
+
 make_tsv_input() {
-  jq -r '.[] | map(tostring) | @tsv' < result.json > result.tsv
+  jq -r '.[] | map(tostring) | @tsv' < $fh > result.tsv
 }
 
 load_into_database() {
@@ -52,6 +57,7 @@ jsonify_output() {
   wrap_in_json_array
   repair_single_quoted_fields
   remove_final_comma
+  convert_dates
   make_tsv_input
   load_into_database
 }
@@ -62,6 +68,9 @@ cleanup() {
   fi
   if [ -f result.tsv ]; then
     rm result.tsv
+  fi
+  if [ -f tmp.json ]; then
+    rm tmp.json
   fi
 }
 
