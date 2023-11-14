@@ -21,6 +21,7 @@ These will come installed on most Linux distributions.
 1. `fifteendays.awk` - an awk script that takes `fifteendays.tsv` and runs some analysis on it - primarily to calculate how many points I need to gain each day going forward to hit the goal of getting to `2700` in fifteen days.
 1. `increment` - a helper bash script that takes the day's ending score, number of successful attempts and number of attempts in that order and adds the next line to `fifteendays.tsv`
 1. `waystation` - a helper bash script that scrapes the chess.com puzzles stats page for a user and downloads statistics for the worked puzzles for that day into a `sqlite3` database called `chessproblems.sqlite`.  
+1. `genpuzzlelist` - a helper bash script that, given a limit and an offset, generates a file `chessproblems.md` containing a list of {limit} problems missed {offset} places from the most recent missed entry in the database
 
 ## Running Fifteendays
 
