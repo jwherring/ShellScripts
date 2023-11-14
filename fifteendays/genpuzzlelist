@@ -1,0 +1,28 @@
+#!/bin/bash
+
+print_usage(){
+cat <<INSTRUCTIONS
+	genpuzzlelist {limit} {offset}
+
+	limit - a number of puzzles
+	offset - how many items to skip
+INSTRUCTIONS
+
+exit 1
+}
+
+get_list() {
+	PUZZLES=(`sqlite3 chessproblems.sqlite <<PZS
+		select code from chessproblems order by rowid desc limit $1 offset $2
+PZS
+`)
+}
+
+if [ $# -ne 2 ]; then
+	print_usage
+fi
+
+get_list $1 $2
+for puzzle in ${PUZZLES[@]}; do
+	echo -e "https://www.chess.com/puzzles/problem/$puzzle/practice" >> chessproblems.md
+done
