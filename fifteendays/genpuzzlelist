@@ -27,5 +27,5 @@ for puzzle in ${PUZZLES[@]}; do
 	echo -e "https://www.chess.com/puzzles/problem/$puzzle/practice" >> chessproblems.md
 done
 
-shuf chessproblems.md tmp.md
+shuf chessproblems.md > tmp.md
 mv tmp.md chessproblems.md
