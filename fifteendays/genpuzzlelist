@@ -23,6 +23,11 @@ if [ $# -ne 2 ]; then
 fi
 
 get_list $1 $2
+
+if [ -f chessproblems.md ]; then 
+  rm chessproblems.md
+fi
+
 for puzzle in ${PUZZLES[@]}; do
 	echo -e "https://www.chess.com/puzzles/problem/$puzzle/practice" >> chessproblems.md
 done
