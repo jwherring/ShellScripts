@@ -22,6 +22,9 @@ These will come installed on most Linux distributions.
 1. `increment` - a helper bash script that takes the day's ending score, number of successful attempts and number of attempts in that order and adds the next line to `fifteendays.tsv`
 1. `waystation` - a helper bash script that scrapes the chess.com puzzles stats page for a user and downloads statistics for the worked puzzles for that day into a `sqlite3` database called `chessproblems.sqlite`.  
 1. `genpuzzlelist` - a helper bash script that, given a limit and an offset, generates a file `chessproblems.md` containing a list of {limit} problems missed {offset} places from the most recent missed entry in the database
+1. `deduplicatedb` - a utility script for deduplicating entires in the database.  Duplicate entires can sneak in if the download script is run on consecutive days where the maximum number of 25 problems a day allowed by `chess.com` on the current plan are not completed.  (This could be avoided by a simple uniqueness constraint on the `chessproblems` table, but that wasn't initially done.)
+1. `chessdb.sql` - defines the schema for the database.  Used by `deduplicatedb`, but also nice to have around.
+1. `deduplicate_rows.awk` - used by `deduplicatedb` to remove any rows - from a `.tsv` file dump of the database - that violate the uniqueness constraint that's now part of the db schema.  
 
 ## Running Fifteendays
 

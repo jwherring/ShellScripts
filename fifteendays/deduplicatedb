@@ -1,0 +1,29 @@
+#!/bin/bash
+
+export_data(){
+  sqlite3 chessproblems.sqlite << EXPT
+.mode tabs
+.output exported.tsv
+select * from chessproblems
+EXPT
+}
+
+deduplicate_data() {
+  awk -f deduplicate_rows.awk exported.tsv > tmp.tsv
+  rm exported.tsv
+}
+
+reimport_data() {
+  rm chessproblems.sqlite
+  sqlite3 chessproblems.sqlite < chessproblems.sql
+  sqlite3 chessproblems.sqlite <<REIMPORT
+.mode tabs
+.import tmp.tsv chessproblems
+REIMPORT
+  rm tmp.tsv
+}
+
+
+export_data
+deduplicate_data
+reimport_data

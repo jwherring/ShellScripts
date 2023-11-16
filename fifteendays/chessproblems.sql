@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS chessproblems (
+CREATE TABLE chessproblems (
     average_time TEXT NOT NULL,
     date TEXT NOT NULL,
     fen TEXT NOT NULL,
@@ -14,6 +14,5 @@ CREATE TABLE IF NOT EXISTS chessproblems (
     move_count INT NOT NULL DEFAULT 0,
     correct_move_count INT NOT NULL DEFAULT 0,
     score INT NOT NULL,
-    target_time TEXT NOT NULL,
-    UNIQUE(date,code)
+    target_time TEXT NOT NULL
 );
