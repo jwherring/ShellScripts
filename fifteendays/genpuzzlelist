@@ -2,35 +2,86 @@
 
 print_usage(){
 cat <<INSTRUCTIONS
-	genpuzzlelist {limit} {offset}
+genpuzzlelist {limit} {offset}
 
-	limit - a number of puzzles
-	offset - how many items to skip
+limit - a number of puzzles (must be a number)
+offset - how many items to skip (must be a number or "rand")
 INSTRUCTIONS
 
 exit 1
 }
 
-get_list() {
-	PUZZLES=(`sqlite3 chessproblems.sqlite <<PZS
-		select code from chessproblems order by rowid desc limit $1 offset $2
-PZS
-`)
+shuffle_problems(){
+  shuf chessproblems.md > tmp.md
+  mv tmp.md chessproblems.md
 }
 
-if [ $# -ne 2 ]; then
+remove_previous_file(){
+  if [ -f chessproblems.md ]; then 
+    rm chessproblems.md
+  fi
+}
+
+cut_file() {
+  head -n $1 chessproblems.md > tmp.md
+  mv tmp.md chessproblems.md
+}
+
+get_limited_list() {
+  remove_previous_file
+	PUZZLES=(`sqlite3 chessproblems.sqlite <<PZS
+		select code from chessproblems where is_passed='false' order by rowid desc limit $1 offset $2
+PZS
+`)
+  for puzzle in ${PUZZLES[@]}; do
+    echo -e "https://www.chess.com/puzzles/problem/$puzzle/practice" >> chessproblems.md
+  done
+  shuffle_problems
+}
+
+get_random_list() {
+  remove_previous_file
+	PUZZLES=(`sqlite3 chessproblems.sqlite <<PZS
+		select code from chessproblems where is_passed='false' order by rowid desc 
+PZS
+`)
+  for puzzle in ${PUZZLES[@]}; do
+    echo -e "https://www.chess.com/puzzles/problem/$puzzle/practice" >> chessproblems.md
+  done
+  shuffle_problems
+  cut_file $1
+}
+
+get_list() {
+  numregexp='^[0-9]+$'
+  if ! [[ $1 =~ $numregexp ]]; then
+    print_usage
+  elif [[ $2 == "rand" ]]; then
+    get_random_list $1
+  elif ! [[ $2 =~ $numregexp ]]; then
+    print_usage
+  else
+    get_limited_list $1 $2
+  fi
+}
+
+get_all() {
+  remove_previous_file
+	PUZZLES=(`sqlite3 chessproblems.sqlite <<PZS
+		select code from chessproblems where is_passed='false' order by rowid desc 
+PZS
+`)
+  for puzzle in ${PUZZLES[@]}; do
+    echo -e "https://www.chess.com/puzzles/problem/$puzzle/practice" >> chessproblems.md
+  done
+  shuffle_problems
+}
+
+if [ $# -eq 0 ]; then
+  get_all
+  exit 0
+elif [ $# -ne 2 ]; then
 	print_usage
+else
+  get_list $1 $2
 fi
-
-get_list $1 $2
-
-if [ -f chessproblems.md ]; then 
-  rm chessproblems.md
-fi
-
-for puzzle in ${PUZZLES[@]}; do
-	echo -e "https://www.chess.com/puzzles/problem/$puzzle/practice" >> chessproblems.md
-done
-
-shuf chessproblems.md > tmp.md
-mv tmp.md chessproblems.md
