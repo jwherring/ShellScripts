@@ -84,4 +84,5 @@ elif [ $# -ne 2 ]; then
 	print_usage
 else
   get_list $1 $2
+  exit 0
 fi
