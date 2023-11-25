@@ -25,7 +25,7 @@ EOF
 
 get_final_score() {
 	FINAL_SCORE=`sqlite3 chessproblems.sqlite <<EOF
-		select my_rating from chessproblems where date="$TODAY" order by rowid limit 1;
+		select my_rating from chessproblems where date="$TODAY" order by rowid desc limit 1;
 EOF
 	`
 }
