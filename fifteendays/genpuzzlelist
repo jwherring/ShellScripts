@@ -1,14 +1,51 @@
 #!/bin/bash
 
+TODAY=`date +%F`
+numregexp='^[0-9]+$'
+passfailregexp='[pP]ass|PASS|^[pP]$'
+
 print_usage(){
 cat <<INSTRUCTIONS
 genpuzzlelist {limit} {offset}
 
 limit - a number of puzzles (must be a number)
 offset - how many items to skip (must be a number or "rand")
+
+If offset is "rand," genpuzzlelist goes into interactive mode, displaying one link at a time and prompting for a result of retrying the puzzle for each, which is saved in the database.
 INSTRUCTIONS
 
 exit 1
+}
+
+show_results() {
+  cat chessproblems.md
+}
+
+get_code() {
+  CD=`printf "%s" $1 | awk -F/ '{print $6}' - `
+}
+
+save_result() {
+  RS="fail"
+  if [[ $2 =~ $passfailregexp ]]; then
+    RS="pass"
+  fi
+  echo $RS
+  sqlite3 chessproblems.sqlite <<RES
+    insert into exercises(date,code,result) values ('$TODAY',$1,'$RS')
+RES
+}
+
+show_interactive_results() {
+  readarray -t LINKS < chessproblems.md
+  for problem_link in ${LINKS[@]}; do
+    echo $problem_link
+    get_code $problem_link
+    echo "CODE: $CD"
+    echo "INPUT RESULT(P/F):"
+    read result
+    save_result $CD $result
+  done
 }
 
 shuffle_problems(){
@@ -37,6 +74,7 @@ PZS
     echo -e "https://www.chess.com/puzzles/problem/$puzzle/practice" >> chessproblems.md
   done
   shuffle_problems
+  show_results
 }
 
 get_random_list() {
@@ -50,10 +88,10 @@ PZS
   done
   shuffle_problems
   cut_file $1
+  show_interactive_results
 }
 
 get_list() {
-  numregexp='^[0-9]+$'
   if ! [[ $1 =~ $numregexp ]]; then
     print_usage
   elif [[ $2 == "rand" ]]; then
@@ -75,6 +113,7 @@ PZS
     echo -e "https://www.chess.com/puzzles/problem/$puzzle/practice" >> chessproblems.md
   done
   shuffle_problems
+  show_results
 }
 
 if [ $# -eq 0 ]; then

@@ -17,3 +17,9 @@ CREATE TABLE IF NOT EXISTS chessproblems (
     target_time TEXT NOT NULL,
     UNIQUE(date,code)
 );
+
+CREATE TABLE IF NOT EXISTS exercises (
+  date TEXT NOT NULL,
+  code INT NOT NULL,
+  result TEXT NOT NULL
+);
