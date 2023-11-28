@@ -3,6 +3,7 @@
 TODAY=`date +%F`
 numregexp='^[0-9]+$'
 passfailregexp='[pP]ass|PASS|^[pP]$'
+passcount=0
 
 print_usage(){
 cat <<INSTRUCTIONS
@@ -29,11 +30,16 @@ save_result() {
   RS="fail"
   if [[ $2 =~ $passfailregexp ]]; then
     RS="pass"
+    passcount=$(($passcount+1))
   fi
   echo $RS
   sqlite3 chessproblems.sqlite <<RES
     insert into exercises(date,code,result) values ('$TODAY',$1,'$RS')
 RES
+}
+
+show_result_stats(){
+  printf "PASS: %d FAIL: %d TOTAL: %d RATE: %.2f\n" $passcount $(($1-$passcount)) $1 `echo "scale=2; $passcount / $1" | bc`
 }
 
 show_interactive_results() {
@@ -46,6 +52,7 @@ show_interactive_results() {
     read result
     save_result $CD $result
   done
+  show_result_stats $1
 }
 
 shuffle_problems(){
@@ -88,7 +95,7 @@ PZS
   done
   shuffle_problems
   cut_file $1
-  show_interactive_results
+  show_interactive_results $1
 }
 
 get_list() {
