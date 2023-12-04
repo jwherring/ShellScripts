@@ -15,7 +15,7 @@ deduplicate_data() {
 
 reimport_data() {
   rm chessproblems.sqlite
-  sqlite3 chessproblems.sqlite < chessproblems.sql
+  sqlite3 chessproblems.sqlite < chessdb.sql
   sqlite3 chessproblems.sqlite <<REIMPORT
 .mode tabs
 .import tmp.tsv chessproblems
