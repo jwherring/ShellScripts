@@ -25,7 +25,28 @@ These will come installed on most Linux distributions.
 1. `deduplicatedb` - a utility script for deduplicating entires in the database.  Duplicate entires can sneak in if the download script is run on consecutive days where the maximum number of 25 problems a day allowed by `chess.com` on the current plan are not completed.  (This could be avoided by a simple uniqueness constraint on the `chessproblems` table, but that wasn't initially done.)
 1. `chessdb.sql` - defines the schema for the database.  Used by `deduplicatedb`, but also nice to have around.
 1. `deduplicate_rows.awk` - used by `deduplicatedb` to remove any rows - from a `.tsv` file dump of the database - that violate the uniqueness constraint that's now part of the db schema.  
+1. `daytracker.awk` - generalizes `fifteendays.awk` by using environment variables for key components.  To run this, you need to first create a `.env` file that `export`s the relevant variables and then run `source .env`.
 
 ## Running Fifteendays
 
 `awk -f fifteendays.awk fifteendays.tsv`
+
+## Running Daytracker
+
+1. Create a `.env` file with the following values:
+
+```bash
+export CHESS_GOAL=2800
+export CHESS_DAY_RATE=25
+export CHESS_DAYS_ALLOWED=15
+```
+
+(In this example, we're trying to get to 2800 in daily puzzles on chess.com, setting a daily improvement goal of 25 points, and we expect to get to 2800 within 15 days.)
+
+1. Source the `.env` file:
+
+`source .env`
+
+1. Run the script:
+
+`awk -f daytracker.awk fifteendays.tsv`
