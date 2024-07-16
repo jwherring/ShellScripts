@@ -2,6 +2,7 @@
 
 TODAY=`date +%F`
 numregexp='^[0-9]+$'
+dateregexp='^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
 passfailregexp='[pP]ass|PASS|^[pP]$'
 passcount=0
 
@@ -13,6 +14,10 @@ limit - a number of puzzles (must be a number)
 offset - how many items to skip (must be a number or "rand")
 
 If offset is "rand," genpuzzlelist goes into interactive mode, displaying one link at a time and prompting for a result of retrying the puzzle for each, which is saved in the database.
+
+If offset is "yesterday," genpuzzlelist goes into interfactive mode, displaying one link at a time and promping for a result of retyring the puzzle for each, which is saved in the database.  Instead of randomply picking puzzles, it uses the list of puzzles worked the day before the current date.
+
+If offset is a date in YYYY-MM-DD format, genpuzzlelist likewise goes into interactive mode, using puzzles from the date indicated.
 INSTRUCTIONS
 
 exit 1
@@ -98,9 +103,8 @@ PZS
   show_interactive_results $1
 }
 
-get_yesterdays_list() {
+get_day_list() {
   remove_previous_file
-  PREVDATE=`date -d '1 day ago' +%F`
 	PUZZLES=(`sqlite3 chessproblems.sqlite <<PZS
 		select code from chessproblems where date='$PREVDATE' order by rowid desc 
 PZS
@@ -119,7 +123,11 @@ get_list() {
   elif [[ $2 == "rand" ]]; then
     get_random_list $1
   elif [[ $2 == "yesterday" ]]; then
-    get_yesterdays_list $1
+    PREVDATE=`date -d '1 day ago' +%F`
+    get_day_list $1
+  elif [[ $2 =~ $dateregexp ]]; then
+    PREVDATE=$2
+    get_day_list $1
   elif ! [[ $2 =~ $numregexp ]]; then
     print_usage
   else
