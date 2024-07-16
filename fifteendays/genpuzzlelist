@@ -98,11 +98,28 @@ PZS
   show_interactive_results $1
 }
 
+get_yesterdays_list() {
+  remove_previous_file
+  PREVDATE=`date -d '1 day ago' +%F`
+	PUZZLES=(`sqlite3 chessproblems.sqlite <<PZS
+		select code from chessproblems where date='$PREVDATE' order by rowid desc 
+PZS
+`)
+  for puzzle in ${PUZZLES[@]}; do
+    echo -e "https://www.chess.com/puzzles/problem/$puzzle/practice" >> chessproblems.md
+  done
+  shuffle_problems
+  cut_file $1
+  show_interactive_results $1
+}
+
 get_list() {
   if ! [[ $1 =~ $numregexp ]]; then
     print_usage
   elif [[ $2 == "rand" ]]; then
     get_random_list $1
+  elif [[ $2 == "yesterday" ]]; then
+    get_yesterdays_list $1
   elif ! [[ $2 =~ $numregexp ]]; then
     print_usage
   else
