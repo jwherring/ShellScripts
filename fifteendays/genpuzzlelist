@@ -15,9 +15,9 @@ offset - how many items to skip (must be a number or "rand")
 
 If offset is "rand," genpuzzlelist goes into interactive mode, displaying one link at a time and prompting for a result of retrying the puzzle for each, which is saved in the database.
 
-If offset is "yesterday," genpuzzlelist goes into interfactive mode, displaying one link at a time and promping for a result of retyring the puzzle for each, which is saved in the database.  Instead of randomply picking puzzles, it uses the list of puzzles worked the day before the current date.
+If offset is "yesterday," genpuzzlelist goes into interfactive mode, displaying one link at a time and promping for a result of retyring the puzzle for each, which is saved in the database.  Instead of randomly picking puzzles from the entire history, it uses the list of puzzles worked the day before the current date.
 
-If offset is a date in YYYY-MM-DD format, genpuzzlelist likewise goes into interactive mode, using puzzles from the date indicated.
+If offset is a date in YYYY-MM-DD format, genpuzzlelist likewise goes into interactive, random-selection mode, using puzzles from the date indicated.
 INSTRUCTIONS
 
 exit 1
