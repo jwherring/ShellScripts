@@ -1,0 +1,45 @@
+#!/bin/bash
+
+show_usage() {
+cat << INSTRUCTIONS
+updatedb takes a {chess.com username} and a {current chess.com cookie}
+and attempts to scrape the latest puzzles data for that user from the 
+https://www.chess.com/stats/puzzles/{username} page.
+
+{username} - a chess.com username
+{cookie} - the PHPSESSID cookie value from an authenticated stats page
+
+INSTRUCTIONS
+}
+
+fetch_db() {
+  scp lbai:~/chessproblems.sqlite .
+}
+
+save_db() {
+  scp chessproblems.sqlite lbai:~/
+}
+
+run_waystation() {
+  ./waystation $CHESSCOMUSERID $CHESSCOMCOOKIE
+}
+
+main(){
+  CHESSCOMUSERID=$1
+  CHESSCOMCOOKIE=$2
+  
+  fetch_db
+  run_waystation
+  save_db
+}
+
+
+if [ $# -ne 2 ]; then
+  echo "NUM: $#"
+  show_usage
+  exit 1
+fi
+
+main $1 $2
+
+
