@@ -1,0 +1,103 @@
+#!/bin/bash
+
+show_usage() {
+cat << INSTRUCTIONS
+  updatedaylog takes a current ELO score {score}, a number
+  of correctly solved puzzles {correct} and a number of total
+  attempts {attempts} and adds a line to the end of daylog.tsv
+  based on those values
+
+  {score} - a current ELO score
+  {correct} - a number of correct attempts for the current day
+  {attempts} - the number of attempts for the given day
+
+INSTRUCTIONS
+
+  exit 1
+}
+
+get_most_recent_date() {
+
+  ALL_DATES=( `awk '{print $2;}' daylog.tsv` )
+
+  REF_DATE=${ALL_DATES[0]}
+
+  for mydate in ${ALL_DATES[@]}; do
+    if [ $mydate \< $ANCHOR_DATE ] && [ $mydate \> $REF_DATE ]; then
+      REF_DATE=$mydate
+    fi
+  done
+
+}
+
+get_last_score() {
+
+  LAST_SCORE=`awk 'END{print $4;}' daylog.tsv`
+
+}
+
+check_score() {
+
+  if ! [[ $SCORE =~ ^[0-9]{4}$ ]]; then
+    show_usage
+  fi
+
+}
+
+check_correct() {
+
+  if ! [[ $CORRECT =~ ^[0-9]{1,2}$ ]]; then
+    show_usage
+  fi
+
+}
+
+check_attempts() {
+
+  if ! [[ $ATTEMPTS =~ ^[0-9]{1,2}$ ]]; then
+    show_usage
+  fi
+
+}
+
+get_line_number_from_date() {
+
+  LINE_NO=$( awk "/.*${1}/{print \$1;}" daylog.tsv)
+
+}
+
+
+add_line() {
+
+  echo $LINE_NO
+  $( sed -i "/${LINE_NO}/a ${LINE_NO}\t${ANCHOR_DATE}\t${LAST_SCORE}\t${SCORE}\t${CORRECT}\t${ATTEMPTS}" daylog.tsv )
+
+}
+
+main() {
+
+  get_last_score
+  check_score
+  check_correct
+  check_attempts
+  get_most_recent_date
+  get_line_number_from_date $REF_DATE
+  add_line
+
+}
+
+if [ $# -lt 3 ]; then
+  show_usage
+fi
+
+if [ $# -eq 4 ]; then
+  ANCHOR_DATE=$4
+else
+  ANCHOR_DATE=`date +%F`
+fi
+
+SCORE=$1
+CORRECT=$2
+ATTEMPTS=$3
+
+main
