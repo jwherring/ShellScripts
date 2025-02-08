@@ -62,27 +62,41 @@ check_attempts() {
 
 get_line_number_from_date() {
 
-  LINE_NO=$( awk "/.*${1}/{print \$1;}" daylog.tsv)
+  LINE_NO=$( awk "/^.*${REF_DATE}/{print \$1;}" daylog.tsv)
+
+}
+
+get_last_score_from_date() {
+
+  LAST_SCORE=$( awk "/^.*${REF_DATE}/{print \$4;}" daylog.tsv)
 
 }
 
 
 add_line() {
 
-  echo $LINE_NO
-  $( sed -i "/${LINE_NO}/a ${LINE_NO}\t${ANCHOR_DATE}\t${LAST_SCORE}\t${SCORE}\t${CORRECT}\t${ATTEMPTS}" daylog.tsv )
+  echo "ADDING LINE AT POSITION $LINE_NO..."
+  $( sed -i "/^${LINE_NO}/a ${LINE_NO}\t${ANCHOR_DATE}\t${LAST_SCORE}\t${SCORE}\t${CORRECT}\t${ATTEMPTS}" daylog.tsv )
+
+}
+
+renumber_lines() {
+
+  awk '{printf NR "\t"; for (i=2; i < NF; i++) printf $i "\t"; print $NF;}' daylog.tsv > daylog.tmp
 
 }
 
 main() {
 
-  get_last_score
   check_score
   check_correct
   check_attempts
   get_most_recent_date
-  get_line_number_from_date $REF_DATE
+  get_last_score_from_date
+  get_line_number_from_date
   add_line
+  renumber_lines
+
 
 }
 
