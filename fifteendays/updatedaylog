@@ -36,6 +36,14 @@ get_last_score() {
 
 }
 
+check_date() {
+
+  if ! [[ $ANCHOR_DATE =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+    show_usage
+  fi
+
+}
+
 check_score() {
 
   if ! [[ $SCORE =~ ^[0-9]{4}$ ]]; then
@@ -91,6 +99,7 @@ main() {
   check_score
   check_correct
   check_attempts
+  check_date
   get_most_recent_date
   get_last_score_from_date
   get_line_number_from_date
