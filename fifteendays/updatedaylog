@@ -97,10 +97,9 @@ main() {
   add_line
   renumber_lines
 
-
 }
 
-if [ $# -lt 3 ]; then
+if [ $# -lt 3 ] || [ $# -gt 4 ]; then
   show_usage
 fi
 
