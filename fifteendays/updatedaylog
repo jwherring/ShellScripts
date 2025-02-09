@@ -91,6 +91,7 @@ add_line() {
 renumber_lines() {
 
   awk '{printf NR "\t"; for (i=2; i < NF; i++) printf $i "\t"; print $NF;}' daylog.tsv > daylog.tmp
+  mv daylog.tmp daylog.tsv
 
 }
 
